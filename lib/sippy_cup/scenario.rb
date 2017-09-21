@@ -473,6 +473,16 @@ Content-Length: 0
     end
 
     #
+    # add audio to pcap from wav file
+    #
+    # @param [String] path of wav file
+    #
+    def play_audio(wav_file)
+      raise "Media not started" unless @media
+      @media << "play:#{wav_file}"
+    end
+
+    #
     # Send DTMF digits
     #
     # @param [String] DTMF digits to send. Must be 0-9, *, # or A-D
