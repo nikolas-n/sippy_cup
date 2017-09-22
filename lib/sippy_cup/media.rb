@@ -1,8 +1,10 @@
 # encoding: utf-8
 require 'ipaddr'
 require 'wavefile'
+require 'ffi'
 require 'sippy_cup/media/pcmu_payload'
 require 'sippy_cup/media/dtmf_payload'
+require 'sippy_cup/g711'
 
 module SippyCup
   class Media
@@ -86,7 +88,7 @@ module SippyCup
           timestamp += count * DTMFPayload::TIMESTAMP_INTERVAL
         when 'play'
           # value is wav file path
-          wav = WaveFile::Reader.new(value, WaveFile::Format.new(:mono, :pcm_8, 8000))
+          wav = WaveFile::Reader.new(value, WaveFile::Format.new(:mono, :pcm_16, 8000))
           duration = wav.total_sample_frames * 1000 / wav.native_format.sample_rate # in milliseconds
 
           (duration / @generator::PTIME).times do |i|
@@ -105,9 +107,9 @@ module SippyCup
             rtp_frame.rtp_ssrc_id = ssrc_id
 
             len = wav.native_format.sample_rate * rtp_frame.ptime / 1000
-            data = wav.read(len).samples
-			puts len, data.flatten.pack('n*'), "--"
-            packet.headers.last.body = rtp_frame.header.to_s << data.flatten.pack('c*')
+            lin_data = wav.read(len).samples
+			enc_data = G711::encode(lin_data)
+            packet.headers.last.body = rtp_frame.header.to_s << enc_data.flatten.pack('c*')
             packet.recalc
             @pcap_file.body << get_pcap_packet(packet, next_ts(start_time, elapsed))
           end
