@@ -175,9 +175,8 @@ o=user1 53655765 2353687637 IN IP[local_ip_type] #{@adv_ip}
 s=-
 c=IN IP[media_ip_type] [media_ip]
 t=0 0
-m=audio [auto_media_port] RTP/AVP 0 8 101
+m=audio [auto_media_port] RTP/AVP 0 101
 a=rtpmap:0 PCMU/8000
-a=rtpmap:8 PCMA/8000
 a=rtpmap:101 telephone-event/8000
 a=fmtp:101 0-15
       MSG
