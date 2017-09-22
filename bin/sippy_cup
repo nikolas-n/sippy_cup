@@ -2,6 +2,7 @@
 
 require 'sippy_cup'
 require 'getoptlong'
+require 'yaml_extend'
 
 def usage
   puts "#{$0} [OPTS] </path/to/sippy_cup_definition.yml>"
@@ -59,7 +60,10 @@ unless compile || run
   exit 1
 end
 
-scenario = SippyCup::Scenario.from_manifest File.read(manifest_path), input_filename: manifest_path
+config = YAML.ext_load_file(manifest_path)
+manifest = config.to_yaml
+
+scenario = SippyCup::Scenario.from_manifest manifest, input_filename: manifest_path
 if scenario.valid?
   scenario.compile! if compile
 else
