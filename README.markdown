@@ -6,6 +6,12 @@
 
 # Sippy Cup
 
+## NOTES for this fork
+
+* New instruction is added to insert wav file into pcap
+  `- play_audio "<wav file path>"`
+* Debug the DTMF packet generation (end of event) 
+
 ## Overview
 
 ### The Problem
