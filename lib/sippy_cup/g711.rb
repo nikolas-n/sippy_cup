@@ -24,11 +24,11 @@ module SippyCup
       iptr = FFI::MemoryPointer.new(:int16, samples.size)
       optr = FFI::MemoryPointer.new(:uint8, samples.size)
 
-	  puts samples.join(' ')
+	  #puts samples.join(' ')
       iptr.write_array_of_type(:int16, :write_int16, samples)
       g711_encode(state, optr, iptr, samples.size)
       output = optr.read_array_of_type(:uint8, :read_uint8, samples.size)
-	  puts output.join(' ')
+	  #puts output.join(' ')
       output
     end
     module_function :encode

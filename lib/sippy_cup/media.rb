@@ -51,13 +51,11 @@ module SippyCup
           (value.to_i / @generator::PTIME).times do
             packet = new_packet
             rtp_frame = @generator.new
-
             # The first RTP audio packet should have the marker bit set
             if first_audio
               rtp_frame.rtp_marker = 1
               first_audio = false
             end
-
             rtp_frame.rtp_timestamp = timestamp += rtp_frame.timestamp_interval
             elapsed += rtp_frame.ptime
             rtp_frame.rtp_sequence_num = sequence_number += 1
@@ -68,18 +66,22 @@ module SippyCup
           end
         when 'dtmf'
           # value is the DTMF digit to send
-          # append that RFC2833 digit
-          # Assume 0.25 second duration for now
-          count = 250 / DTMFPayload::PTIME
+          # append that RFC4733 digit
+          # Assume 0.2 second duration for now
+          count = 200 / DTMFPayload::PTIME
           count.times do |i|
             packet = new_packet
             dtmf_frame = DTMFPayload.new value
-            dtmf_frame.rtp_marker = 1 if i == 0
-            dtmf_frame.rtp_timestamp = timestamp # Is this correct? This is what Blink does...
-            #dtmf_frame.rtp_timestamp = timestamp += dtmf_frame.timestamp_interval
+            # The first RTP audio packet should have the marker bit set
+            if first_audio
+              rtp_frame.rtp_marker = 1
+              first_audio = false
+            end
+            dtmf_frame.rtp_timestamp = timestamp += dtmf_frame.timestamp_interval
+            elapsed += dtmf_frame.ptime
             dtmf_frame.rtp_sequence_num = sequence_number += 1
             dtmf_frame.rtp_ssrc_id = ssrc_id
-            dtmf_frame.end_of_event = (count == i) # Last packet?
+            dtmf_frame.end_of_event = (i == count-1) # Last packet
             packet.headers.last.body = dtmf_frame.to_bytes
             packet.recalc
             @pcap_file.body << get_pcap_packet(packet, next_ts(start_time, elapsed))
@@ -90,22 +92,18 @@ module SippyCup
           # value is wav file path
           wav = WaveFile::Reader.new(value, WaveFile::Format.new(:mono, :pcm_16, 8000))
           duration = wav.total_sample_frames * 1000 / wav.native_format.sample_rate # in milliseconds
-
           (duration / @generator::PTIME).times do |i|
             packet = new_packet
             rtp_frame = @generator.new
-
             # The first RTP audio packet should have the marker bit set
             if first_audio
               rtp_frame.rtp_marker = 1
               first_audio = false
             end
-
             rtp_frame.rtp_timestamp = timestamp += rtp_frame.timestamp_interval
             elapsed += rtp_frame.ptime
             rtp_frame.rtp_sequence_num = sequence_number += 1
             rtp_frame.rtp_ssrc_id = ssrc_id
-
             len = wav.native_format.sample_rate * rtp_frame.ptime / 1000
             lin_data = wav.read(len).samples
 			enc_data = G711::encode(lin_data)
