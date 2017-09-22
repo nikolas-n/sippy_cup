@@ -9,8 +9,11 @@
 ## NOTES for this fork
 
 * New instruction is added to insert wav file into pcap
-  `- play_audio "<wav file path>"`
+  -  `- play_audio "<wav file path>"`
+  - need spandsp library for encoidng a-law and u-law
 * Debug the DTMF packet generation (end of event) 
+  - reduce the duration to 200 milliseconds
+  - change obsolete rfc2833 to rfc4733
 
 ## Overview
 
