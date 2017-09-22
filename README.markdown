@@ -14,6 +14,7 @@
 * Debug the DTMF packet generation (end of event) 
   - reduce the duration to 200 milliseconds
   - change obsolete rfc2833 to rfc4733
+* Can use nested yamls, provided by yaml_extend
 
 ## Overview
 
