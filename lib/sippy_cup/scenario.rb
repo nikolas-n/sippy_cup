@@ -88,7 +88,7 @@ module SippyCup
     # @option options [Integer] :media_port The RTCP (media) port to bind to locally.
     # @option options [String, Numeric] :max_concurrent The maximum number of concurrent calls to execute.
     # @option options [String, Numeric] :number_of_calls The maximum number of calls to execute in the test run.
-    # @option options [String, Numeric] :calls_per_second The rate at which to initiate calls.
+    # @option options [String, Numeric] :call_rate The rate at which to initiate calls.
     # @option options [String] :stats_file The path at which to dump statistics.
     # @option options [String, Numeric] :stats_interval The interval (in seconds) at which to dump statistics (defaults to 1s).
     # @option options [String] :transport_mode The transport mode over which to direct SIP traffic.
