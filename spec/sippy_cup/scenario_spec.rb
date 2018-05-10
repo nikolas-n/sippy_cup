@@ -177,6 +177,13 @@ describe SippyCup::Scenario do
         expect(subject.to_xml).to match(%r{\[authentication username=frank password=abc123\]})
       end
     end
+
+    context "when a auth_keyword option is provided" do
+      it "adds parameterized authentication data to the REGISTER message" do
+        subject.register 'frank', nil, { auth_keyword: 'field0' }
+        expect(subject.to_xml).to match(%r{\[field0\]})
+      end
+    end
   end
 
   describe '#receive_trying' do
