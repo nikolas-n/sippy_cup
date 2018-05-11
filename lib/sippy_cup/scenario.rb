@@ -499,7 +499,7 @@ Content-Length: 0
           @media << "dtmf:#{digit}"
           @media << "silence:#{delay}"
         when :info
-          info = <<-INFO
+          info = <<-BODY
 
 INFO [next_url] SIP/2.0
 Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch]
@@ -516,7 +516,7 @@ Content-Type: application/dtmf-relay
 
 Signal=#{digit}
 Duration=#{delay}
-          INFO
+          BODY
           send info
           recv response: 200
           pause delay
@@ -581,6 +581,29 @@ Content-Length: 0
     end
 
     #
+    # Send a BYE message using destination of previous messages Contact Header
+    #
+    # @param [Hash] opts A set of options to modify the message parameters
+    #
+    def send_bye_using_contact(opts = {})
+      msg = <<-MSG
+
+BYE sip:[next_url] SIP/2.0
+Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch]
+From: <sip:[$local_addr]>;tag=[call_number]
+To: <sip:[$remote_addr]>;tag=[$remote_tag]
+Contact: <sip:[$local_addr];transport=[transport]>
+Call-ID: [call_id]
+CSeq: [cseq] BYE
+Max-Forwards: 100
+User-Agent: #{USER_AGENT}
+Content-Length: 0
+[routes]
+      MSG
+      send msg, opts
+    end
+
+    #
     # Expect to receive a BYE message
     #
     # @param [Hash] opts A set of options to modify the expectation
@@ -629,7 +652,10 @@ Content-Length: 0
     # @param [Hash] opts A set of options containing SIPp <recv> element attributes - will be passed to both the <send> and <recv> elements
     #
     def hangup(opts = {})
-      send_bye opts
+      # Use contact is an option to make the bye use the value from the contact header for RURI
+      # As opposed to using the standard $call_addr variable set previously
+      use_contact = opts.delete(:use_contact)
+      use_contact ? send_bye_using_contact(opts) : send_bye(opts)
       receive_ok opts
     end
 

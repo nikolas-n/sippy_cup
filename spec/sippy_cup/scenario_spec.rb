@@ -422,6 +422,22 @@ describe SippyCup::Scenario do
     end
   end
 
+  describe '#hangup' do
+    it 'calls send_bye and receive_ok by default' do
+      opts = { foo: 'bar' }
+      expect(subject).to receive(:send_bye).with(opts)
+      expect(subject).to receive(:receive_ok).with(opts)
+      subject.hangup opts
+    end
+
+    it 'calls send_by_using_contact and receive_ok when passed a use_contact option' do
+      opts = { foo: 'bar', use_contact: true }
+      expect(subject).to receive(:send_bye_using_contact).with({ foo: 'bar' })
+      expect(subject).to receive(:receive_ok).with({ foo: 'bar' })
+      subject.hangup opts
+    end
+  end
+
   describe '#call_length_repartition' do
     it 'create a partition table' do
       subject.call_length_repartition('1', '10', '2')
