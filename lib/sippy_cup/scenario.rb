@@ -466,6 +466,29 @@ Content-Length: 0
       start_media
     end
 
+    def proxy_auth_required(opts = {})
+      recv(response: opts[:status_code] || 407, rrs: true, auth: true)
+
+      ack_msg = <<-BODY
+
+ACK sip:#{to_addr} SIP/2.0
+Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch]
+From: "#{@from_user}" <sip:#{@from_user}@#{@adv_ip}:[local_port]>;tag=[call_number]
+To: <sip:#{to_addr}>[peer_tag_param]
+Call-ID: [call_id]
+CSeq: [cseq] ACK
+Contact: <sip:[$local_addr];transport=[transport]>
+Max-Forwards: 100
+User-Agent: #{USER_AGENT}
+Content-Length: 0
+[routes]
+
+      BODY
+
+      send ack_msg, {}
+    end
+    alias :receive_407 :proxy_auth_required
+
     #
     # Insert a pause into the scenario and its media of the specified duration
     #

@@ -320,6 +320,33 @@ describe SippyCup::Scenario do
     end
   end
 
+  describe '#proxy_auth_required' do
+    it "expects a 407 by default" do
+      subject.proxy_auth_required
+
+      expect(subject.to_xml).to match(%r{<recv response="407" rrs="true" auth="true"/>})
+    end
+
+    it "can override the expected status code via options" do
+      status_code = 401
+      subject.proxy_auth_required(status_code: status_code)
+
+      expect(subject.to_xml).to match(%r{<recv response="#{status_code}" rrs="true" auth="true"/>})
+    end
+
+    it "sends an ACK" do
+      subject.proxy_auth_required
+
+      xml = subject.to_xml
+      expect(xml).to match(%r{<send>})
+      expect(xml).to match(%r{ACK})
+    end
+
+    it "can also be called via :receive_407" do
+      expect(subject.method(:receive_407)).to eq(subject.method(:proxy_auth_required))
+    end
+  end
+
   describe '#wait_for_answer' do
     it "tells SIPp to optionally receive a SIP 100, 180 and 183 by default, while requiring a 200" do
       scenario.wait_for_answer
