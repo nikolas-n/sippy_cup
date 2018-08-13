@@ -317,7 +317,7 @@ Content-Length: 0
       opts[:retrans] ||= DEFAULT_RETRANS
       msg = <<-MSG
 
-SIP/2.0 200 Ok
+SIP/2.0 200 OK
 [last_Via:]
 From: <sip:[$remote_addr]>;tag=[$remote_tag]
 To: <sip:[$local_addr]>;tag=[call_number]
@@ -326,7 +326,7 @@ To: <sip:[$local_addr]>;tag=[call_number]
 Server: #{USER_AGENT}
 Contact: <sip:[$local_addr];transport=[transport]>
 Content-Type: application/sdp
-[routes]
+[last_Record-Route:]
 Content-Length: [len]
 
 v=0
@@ -337,7 +337,7 @@ t=0 0
 m=audio [media_port] RTP/AVP 0
 a=rtpmap:0 PCMU/8000
       MSG
-      start_media
+      # start_media
       send msg, opts
     end
 
