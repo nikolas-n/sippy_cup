@@ -145,6 +145,21 @@ module SippyCup
       end
     end
 
+    def options(opts = {})
+      msg = <<-MSG
+OPTIONS sip:[remote_ip] SIP/2.0
+Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch]
+From: <sip:sipp@#{@adv_ip}>;tag=[call_number]
+To: <sip:[remote_ip]>
+Call-ID: [call_id]
+CSeq: [cseq] OPTIONS
+Max-Forwards: 100
+User-Agent: #{USER_AGENT}
+Content-Length: 0
+MSG
+      send msg, opts
+    end
+
     #
     # Send an invite message
     #

@@ -26,6 +26,15 @@ describe SippyCup::Scenario do
     expect(subject.to_xml).to match(%r{<scenario name="Test"/>})
   end
 
+  describe '#options' do
+    it "sends an OPTIONS message" do
+      subject.options
+
+      expect(subject.to_xml).to match(%r{<send>})
+      expect(subject.to_xml).to match(%r{OPTIONS})
+    end
+  end
+
   describe '#invite' do
     it "sends an INVITE message" do
       subject.invite
