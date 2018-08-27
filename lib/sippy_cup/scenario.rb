@@ -172,6 +172,7 @@ MSG
       # FIXME: The DTMF mapping (101) is hard-coded. It would be better if we could
       # get this from the DTMF payload generator
       from_addr = "#{@from_user}@#{@adv_ip}:[local_port]"
+      max_forwards = opts[:max_forwards] || 100
       msg = <<-MSG
 
 INVITE sip:#{to_addr} SIP/2.0
@@ -181,7 +182,7 @@ To: <sip:#{to_addr}>
 Call-ID: [call_id]
 CSeq: [cseq] INVITE
 Contact: <sip:#{from_addr};transport=[transport]>
-Max-Forwards: 100
+Max-Forwards: #{max_forwards}
 User-Agent: #{USER_AGENT}
 Content-Type: application/sdp
 Content-Length: [len]
@@ -440,6 +441,11 @@ a=rtpmap:0 PCMU/8000
       recv({ response: 200 }.merge(opts), &block)
     end
     alias :receive_200 :receive_ok
+
+    def receive_too_many_hops(opts = {}, &block)
+      recv({ response: 483 }.merge(opts), &block)
+    end
+    alias :receive_483 :receive_too_many_hops
 
     #
     # Convenience method to wait for an answer from the called party

@@ -128,6 +128,15 @@ describe SippyCup::Scenario do
         expect(subject.to_xml).to match(%r{INVITE sip:\[service\]@\[remote_ip\]:\[remote_port\]})
       end
     end
+
+    context "when a Max-Forward option is specified" do
+      it "sets the Max-Forward header properly" do
+        max_forwards = rand(100)
+        subject.invite(max_forwards: max_forwards)
+        expect(subject.to_xml).to match(%r{INVITE})
+        expect(subject.to_xml).to match(%r{Max-Forwards: #{max_forwards}})
+      end
+    end
   end
 
   describe "#register" do
@@ -292,6 +301,22 @@ describe SippyCup::Scenario do
       subject.receive_200 response: 999 # Silly but still...
 
       expect(scenario.to_xml).to match(%q{<recv response="999"/>})
+    end
+  end
+
+  describe '#receive_too_many_hops' do
+    it "expects a 483" do
+      subject.receive_too_many_hops
+
+      expect(scenario.to_xml).to match(%q{<recv response="483"/>})
+    end
+  end
+
+  describe '#receive_483' do
+    it "expects a 483" do
+      subject.receive_too_many_hops
+
+      expect(scenario.to_xml).to match(%q{<recv response="483"/>})
     end
   end
 
