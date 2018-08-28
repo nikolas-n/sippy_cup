@@ -242,7 +242,7 @@ a=fmtp:101 0-15
         else
           send register_auth(domain, user, password), send_opts
         end
-          receive_ok opts.merge(optional: false) unless opts[:skip_receive_ok]
+        receive_ok opts.merge(optional: false) unless opts[:skip_receive_ok]
       else
         send register_message(domain, user), send_opts
       end
