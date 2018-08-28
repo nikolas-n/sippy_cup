@@ -242,9 +242,7 @@ a=fmtp:101 0-15
         else
           send register_auth(domain, user, password), send_opts
         end
-        if !opts[:receive_no_ok].present?
-          receive_ok opts.merge(optional: false)
-        end
+          receive_ok opts.merge(optional: false) unless opts[:skip_receive_ok]
       else
         send register_message(domain, user), send_opts
       end
@@ -489,7 +487,7 @@ Content-Length: 0
       start_media
     end
 
-    def auth_required(opts={})
+    def auth_required(opts = {})
       recv(response: opts[:status_code] || 401, auth:true)
     end
     alias :receive_401 :auth_required
