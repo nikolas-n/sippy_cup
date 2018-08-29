@@ -83,7 +83,8 @@ module SippyCup
     # @option options [String, Numeric] :source_port The source port to bind SIPp to (defaults to 8836).
     # @option options [String] :destination The target system at which to direct traffic.
     # @option options [String] :advertise_address The IP address to advertise in SIP and SDP if different from the bind IP (defaults to the bind IP).
-    # @option options [String] :from_user The SIP user from which traffic should appear.
+    # @option options [String] :from_user The SIP user from which traffic should appear. Overwrites user in :from if passed.
+    # @option options [String] :from The SIP user / address from which traffic should appear.
     # @option options [String] :to_user The SIP user to send requests to. Alias for `:to` and deprecated in favour of the same.
     # @option options [String] :to The SIP user / address to send requests to.
     # @option options [Integer] :media_port The RTCP (media) port to bind to locally.
@@ -171,7 +172,8 @@ MSG
       opts[:retrans] ||= 500
       # FIXME: The DTMF mapping (101) is hard-coded. It would be better if we could
       # get this from the DTMF payload generator
-      from_addr = "#{@from_user}@#{@adv_ip}:[local_port]"
+      from_domain = @from_domain || @adv_ip
+      from_addr = "#{@from_user}@#{from_domain}:[local_port]"
       max_forwards = opts[:max_forwards] || 100
       msg = <<-MSG
 
@@ -858,7 +860,11 @@ Content-Length: 0
         @dtmf_mode = :rfc2833
       end
 
-      @from_user = args[:from_user] || "sipp"
+      if args[:from]
+        @from_user, @from_domain = args[:from].to_s.split('@')
+      else
+        @from_user = args[:from_user] || "sipp"
+      end
 
       args[:to] ||= args[:to_user] if args.has_key?(:to_user)
       if args[:to]
