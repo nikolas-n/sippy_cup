@@ -369,6 +369,22 @@ a=rtpmap:0 PCMU/8000
       receive_ack opts
     end
 
+    def send_cancel(opts = {})
+      msg = <<-MSG
+
+CANCEL sip:#{to_addr} SIP/2.0
+[last_Via:]
+From: <sip:[$remote_addr]>
+To: <sip:[$local_addr]>;tag=[call_number]
+[last_Call-ID:]
+[last_CSeq:]
+#{opts.has_key?(:headers) ? opts.delete(:headers).sub(/\n*\Z/, "\n") : ''}
+Server: #{USER_AGENT}
+Content-Length: 0
+      MSG
+      send msg, opts
+    end
+
     def receive_ack(opts = {})
       recv opts.merge request: 'ACK'
     end
@@ -448,6 +464,11 @@ a=rtpmap:0 PCMU/8000
       recv({ response: 483 }.merge(opts), &block)
     end
     alias :receive_483 :receive_too_many_hops
+
+    def receive_request_terminated(opts = {}, &block)
+      recv({ response: 487 }.merge(opts), &block)
+    end
+    alias :receive_487 :receive_request_terminated
 
     #
     # Convenience method to wait for an answer from the called party
