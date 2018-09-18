@@ -538,6 +538,11 @@ Content-Length: 0
     end
     alias :receive_407 :proxy_auth_required
 
+    def receive_forbidden(opts = {})
+      recv(response: opts[:status_code] || 403, auth:true)
+    end
+    alias :receive_403 :receive_forbidden
+
     #
     # Insert a pause into the scenario and its media of the specified duration
     #
