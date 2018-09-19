@@ -539,7 +539,7 @@ Content-Length: 0
     alias :receive_407 :proxy_auth_required
 
     def receive_forbidden(opts = {})
-      recv(response: opts[:status_code] || 403, auth:true)
+      recv(response: opts[:status_code] || 403)
     end
     alias :receive_403 :receive_forbidden
 

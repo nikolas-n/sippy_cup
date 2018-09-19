@@ -381,6 +381,18 @@ describe SippyCup::Scenario do
     end
   end
 
+  describe '#receive forbidden' do
+    it "expects a 403 forbidden response" do
+      subject.receive_forbidden
+
+      expect(scenario.to_xml).to match(%r{<recv response="403"/>})
+    end
+
+    it "can also be called via :receive_403" do
+      expect(subject.method(:receive_403)).to eq(subject.method(:receive_forbidden))
+    end
+  end
+
   describe '#wait_for_answer' do
     it "tells SIPp to optionally receive a SIP 100, 180 and 183 by default, while requiring a 200" do
       scenario.wait_for_answer
