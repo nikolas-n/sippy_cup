@@ -467,6 +467,22 @@ Content-Length: 0
 
     def receive_request_terminated(opts = {}, &block)
       recv({ response: 487 }.merge(opts), &block)
+
+      ack_msg = <<-BODY
+
+ACK sip:[service]@#{@to_domain} SIP/2.0
+Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch-8]
+From: "#{@from_user}" <sip:#{@from_user}@poc-mike.tncp.textnow.com:[local_port]>;tag=[call_number]
+To: <sip:#{to_addr}>[peer_tag_param]
+Call-ID: [call_id]
+CSeq: [cseq] ACK
+Max-Forwards: 100
+Content-Length: 0
+[routes]
+
+      BODY
+
+      send ack_msg, {}
     end
     alias :receive_487 :receive_request_terminated
 
@@ -521,7 +537,7 @@ Content-Length: 0
       ack_msg = <<-BODY
 
 ACK sip:#{to_addr} SIP/2.0
-Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch]
+Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch-2]
 From: "#{@from_user}" <sip:#{@from_user}@#{@adv_ip}:[local_port]>;tag=[call_number]
 To: <sip:#{to_addr}>[peer_tag_param]
 Call-ID: [call_id]
