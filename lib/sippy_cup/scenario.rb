@@ -183,7 +183,7 @@ From: "#{@from_user}" <sip:#{from_addr}>;tag=[call_number]
 To: <sip:#{to_addr}>
 Call-ID: [call_id]
 CSeq: [cseq] INVITE
-Contact: <sip:#{from_addr};transport=[transport]>
+Contact: <sip:#{@from_user}@#{@adv_ip}:[local_port];transport=[transport]>
 Max-Forwards: #{max_forwards}
 User-Agent: #{USER_AGENT}
 Content-Type: application/sdp
@@ -217,6 +217,26 @@ a=fmtp:101 0-15
       end
       # These variables will only be used if we initiate a hangup
       @reference_variables += %w(remote_addr local_addr call_addr)
+    end
+
+    def subscribe(opts = {})
+      msg = <<-MSG
+SUBSCRIBE sip:#{@from_user}@#{@adv_ip} SIP/2.0
+Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch]
+From: <sip:#{@from_user}@#{@adv_ip} >;tag=[call_number]
+To: <sip:#{@from_user}@#{@adv_ip} >
+Contact: <sip:#{@from_user}@#{@adv_ip}:[local_port];transport=[transport]>
+Call-ID: [call_id]
+CSeq: [cseq] SUBSCRIBE
+Expires: 300
+Accept: application/simple-message-summary
+Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE
+User-Agent: #{USER_AGENT}
+Event: message-summary
+Max-Forwards: 10
+Content-Length: 0
+MSG
+      send msg, opts
     end
 
     #
@@ -471,7 +491,7 @@ Content-Length: 0
       ack_msg = <<-BODY
 
 ACK sip:[service]@#{@to_domain} SIP/2.0
-Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch-8]
+Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch-7]
 From: "#{@from_user}" <sip:#{@from_user}@poc-mike.tncp.textnow.com:[local_port]>;tag=[call_number]
 To: <sip:#{to_addr}>[peer_tag_param]
 Call-ID: [call_id]
