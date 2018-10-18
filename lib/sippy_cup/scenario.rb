@@ -175,6 +175,7 @@ MSG
       from_domain = @from_domain || @adv_ip
       from_addr = "#{@from_user}@#{from_domain}:[local_port]"
       max_forwards = opts[:max_forwards] || 100
+      user_agent = opts[:user_agent].present? ? opts[:user_agent]: USER_AGENT
       msg = <<-MSG
 
 INVITE sip:#{to_addr} SIP/2.0
@@ -185,7 +186,7 @@ Call-ID: [call_id]
 CSeq: [cseq] INVITE
 Contact: <sip:#{@from_user}@#{@adv_ip}:[local_port];transport=[transport]>
 Max-Forwards: #{max_forwards}
-User-Agent: #{USER_AGENT}
+User-Agent: #{user_agent}
 Content-Type: application/sdp
 Content-Length: [len]
 #{opts.has_key?(:headers) ? opts.delete(:headers).sub(/\n*\Z/, "\n") : ''}
@@ -253,11 +254,12 @@ MSG
     #   s.register 'frank'
     #
     def register(user, password = nil, opts = {})
+      user_agent = opts[:user_agent].present? ? opts[:user_agent] : USER_AGENT
       send_opts = opts.dup
       send_opts[:retrans] ||= DEFAULT_RETRANS
       user, domain = parse_user user
       if password || opts[:auth_keyword]
-        send register_message(domain, user), send_opts
+        send register_message(domain, user, user_agent), send_opts
         recv opts.merge(response: 401, auth: true, optional: false)
         if opts[:auth_keyword].present?
           send register_auth_parameterized(domain, user, opts[:auth_keyword]), send_opts
@@ -266,7 +268,7 @@ MSG
         end
         receive_ok opts.merge(optional: false) unless opts[:skip_receive_ok]
       else
-        send register_message(domain, user), send_opts
+        send register_message(domain, user, user_agent), send_opts
       end
     end
 
@@ -485,6 +487,28 @@ Content-Length: 0
     end
     alias :receive_483 :receive_too_many_hops
 
+    def receive_userbusy(opts = {}, &block)
+      recv({ response: 486 }.merge(opts), &block)
+
+      ack_msg = <<-BODY
+
+ACK sip:[service]@#{@to_domain} SIP/2.0
+Via: SIP/2.0/[transport] #{@adv_ip}:[local_port];branch=[branch-7]
+From: "#{@from_user}" <sip:#{@from_user}@poc-mike.tncp.textnow.com:[local_port]>;tag=[call_number]
+To: <sip:#{to_addr}>[peer_tag_param]
+Call-ID: [call_id]
+CSeq: [cseq] ACK
+Max-Forwards: 100
+Content-Length: 0
+[routes]
+
+      BODY
+
+      send ack_msg, {}
+    end
+    alias :receive_486 :receive_userbusy
+
+    
     def receive_request_terminated(opts = {}, &block)
       recv({ response: 487 }.merge(opts), &block)
 
@@ -505,6 +529,7 @@ Content-Length: 0
       send ack_msg, {}
     end
     alias :receive_487 :receive_request_terminated
+
 
     #
     # Convenience method to wait for an answer from the called party
@@ -940,7 +965,7 @@ Content-Length: 0
       @media.compile!
     end
 
-    def register_message(domain, user)
+    def register_message(domain, user, user_agent)
       <<-BODY
 
 REGISTER sip:#{domain} SIP/2.0
@@ -952,7 +977,7 @@ CSeq: [cseq] REGISTER
 Contact: <sip:#{@from_user}@#{@adv_ip}:[local_port];transport=[transport]>
 Max-Forwards: 10
 Expires: 120
-User-Agent: #{USER_AGENT}
+User-Agent: #{user_agent}
 Content-Length: 0
       BODY
     end
