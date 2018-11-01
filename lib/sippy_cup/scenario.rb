@@ -189,7 +189,7 @@ Max-Forwards: #{max_forwards}
 User-Agent: #{user_agent}
 Content-Type: application/sdp
 Content-Length: [len]
-#{opts.has_key?(:headers) ? opts.delete(:headers).sub(/\n*\Z/, "\n") : ''}
+#{opts.has_key?(:headers) ? opts.delete(:headers).map { |header| header.sub(/\n*\Z/, "\n") }.join : ''}
 v=0
 o=user1 53655765 2353687637 IN IP[local_ip_type] #{@adv_ip}
 s=-

@@ -61,12 +61,12 @@ describe SippyCup::Scenario do
 
     context "with extra headers specified" do
       it "adds the headers to the end of the message" do
-        subject.invite headers: "Foo: <bar>\nBar: <baz>"
+        subject.invite headers: ["Foo: <bar>", "Bar: <baz>"]
         expect(subject.to_xml).to match(%r{Foo: <bar>\nBar: <baz>})
       end
 
       it "only has one blank line between headers and SDP" do
-        subject.invite headers: "Foo: <bar>\n\n\n"
+        subject.invite headers: ["Foo: <bar>\n\n\n"]
         expect(subject.to_xml).to match(%r{Foo: <bar>\n\nv=0})
       end
     end
