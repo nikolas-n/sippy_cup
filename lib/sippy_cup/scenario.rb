@@ -89,11 +89,11 @@ module SippyCup
     # @option options [Integer] :media_port The RTCP (media) port to bind to locally.
     # @option options [String, Numeric] :max_concurrent The maximum number of concurrent calls to execute.
     # @option options [String, Numeric] :number_of_calls The maximum number of calls to execute in the test run.
-    # @option options [String, Numeric] :calls_per_second The rate at which to initiate calls.
+    # @option options [String, Numeric] :call_rate The rate at which to initiate calls.
     # @option options [String] :stats_file The path at which to dump statistics.
     # @option options [String, Numeric] :stats_interval The interval (in seconds) at which to dump statistics (defaults to 1s).
     # @option options [String] :transport_mode The transport mode over which to direct SIP traffic.
-    # @option options [String] :dtmf_mode The output DTMF mode, either rfc2833 (default) or info.
+    # @option options [String] :dtmf_mode The output DTMF mode, either rfc4733 (default) or info.
     # @option options [String] :scenario_variables A path to a CSV file of variables to be interpolated with the scenario at runtime.
     # @option options [Hash] :options A collection of options to pass through to SIPp, as key-value pairs. In cases of value-less options (eg -trace_err), specify a nil value.
     # @option options [Array<String>] :steps A collection of steps
@@ -176,7 +176,7 @@ o=user1 53655765 2353687637 IN IP[local_ip_type] #{@adv_ip}
 s=-
 c=IN IP[media_ip_type] [media_ip]
 t=0 0
-m=audio [media_port] RTP/AVP 0 101
+m=audio [auto_media_port] RTP/AVP 0 101
 a=rtpmap:0 PCMU/8000
 a=rtpmap:101 telephone-event/8000
 a=fmtp:101 0-15
@@ -474,6 +474,16 @@ Content-Length: 0
     end
 
     #
+    # add audio to pcap from wav file
+    #
+    # @param [String] path of wav file
+    #
+    def play_audio(wav_file)
+      raise "Media not started" unless @media
+      @media << "play:#{wav_file}"
+    end
+
+    #
     # Send DTMF digits
     #
     # @param [String] DTMF digits to send. Must be 0-9, *, # or A-D
@@ -486,12 +496,12 @@ Content-Length: 0
     #
     def send_digits(digits)
       raise "Media not started" unless @media
-      delay = (0.250 * MSEC).to_i # FIXME: Need to pass this down to the media layer
+      delay = (0.2 * MSEC).to_i # FIXME: Need to pass this down to the media layer
       digits.split('').each do |digit|
         raise ArgumentError, "Invalid DTMF digit requested: #{digit}" unless VALID_DTMF.include? digit
 
         case @dtmf_mode
-        when :rfc2833
+        when :rfc4733
           @media << "dtmf:#{digit}"
           @media << "silence:#{delay}"
         when :info
@@ -519,7 +529,7 @@ Duration=#{delay}
         end
       end
 
-      if @dtmf_mode == :rfc2833
+      if @dtmf_mode == :rfc4733
         pause delay * 2 * digits.size
       end
     end
@@ -774,9 +784,9 @@ Content-Length: 0
     def parse_args(args)
       if args[:dtmf_mode]
         @dtmf_mode = args[:dtmf_mode].to_sym
-        raise ArgumentError, "dtmf_mode must be rfc2833 or info" unless [:rfc2833, :info].include?(@dtmf_mode)
+        raise ArgumentError, "dtmf_mode must be rfc4733 or info" unless [:rfc4733, :info].include?(@dtmf_mode)
       else
-        @dtmf_mode = :rfc2833
+        @dtmf_mode = :rfc4733
       end
 
       @from_user = args[:from_user] || "sipp"

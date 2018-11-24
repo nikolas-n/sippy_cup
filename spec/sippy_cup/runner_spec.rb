@@ -97,7 +97,7 @@ source: 'dah.com'
 destination: 'bar.com'
 to: 1
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 steps:
   - invite
@@ -124,7 +124,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 options:
   trace_err: ~
@@ -154,7 +154,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 source_port: 1234
 steps:
@@ -182,7 +182,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 from_user: pat
 to: frank@there.com
@@ -211,7 +211,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 media_port: 6000
 steps:
@@ -239,7 +239,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 stats_file: stats.csv
 steps:
@@ -266,7 +266,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 stats_file: stats.csv
 stats_interval: 3
@@ -310,7 +310,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 summary_report_file: report.txt
 steps:
@@ -338,7 +338,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 errors_report_file: errors.txt
 steps:
@@ -366,10 +366,10 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
-calls_per_second_max: 5
-calls_per_second_incr: 2
-calls_per_second_interval: 20
+call_rate: 2
+call_rate_max: 5
+call_rate_incr: 2
+call_rate_interval: 20
 number_of_calls: 10
 errors_report_file: errors.txt
 steps:
@@ -397,7 +397,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 scenario_variables: /path/to/vars.csv
 steps:
@@ -427,7 +427,7 @@ name: foobar
 source: 'dah.com'
 destination: 'bar.com'
 concurrent_max: 5
-calls_per_second: 2
+call_rate: 2
 number_of_calls: 10
 transport_mode: t1
 steps:

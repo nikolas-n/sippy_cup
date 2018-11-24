@@ -22,6 +22,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'nokogiri', ["~> 1.8.1"]
   s.add_runtime_dependency 'activesupport', [">= 3.0"]
   s.add_runtime_dependency 'psych', ["~> 2.0.1"] unless RUBY_PLATFORM == 'java'
+  s.add_runtime_dependency 'wavefile', [">= 0.8.0"]
+  s.add_runtime_dependency 'ffi'
 
   s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rspec', ["~> 3.4"]

@@ -713,7 +713,7 @@ name: spec scenario
 source: 192.0.2.15
 destination: 192.0.2.200
 max_concurrent: 10
-calls_per_second: 5
+call_rate: 5
 number_of_calls: 20
 from_user: #{specs_from}
 steps:
@@ -822,7 +822,7 @@ Content-Length: 0
         'source' => '192.0.2.15',
         'destination' => '192.0.2.200',
         'max_concurrent' => 10,
-        'calls_per_second' => 5,
+        'call_rate' => 5,
         'number_of_calls' => 20,
         'from_user' => "#{specs_from}"
       })
@@ -835,7 +835,7 @@ name: spec scenario
 source: 192.0.2.15
 destination: 192.0.2.200
 max_concurrent: 10
-calls_per_second: 5
+call_rate: 5
 number_of_calls: 20
 from_user: #{specs_from}
 scenario: #{scenario_path}
@@ -857,7 +857,7 @@ name: spec scenario
 source: 192.0.2.15
 destination: 192.0.2.200
 max_concurrent: 10
-calls_per_second: 5
+call_rate: 5
 number_of_calls: 20
 from_user: #{specs_from}
 scenario: #{scenario_path}
@@ -881,7 +881,7 @@ media: #{media_path}
 source: 192.0.2.15
 destination: 192.0.2.200
 max_concurrent: 10
-calls_per_second: 5
+call_rate: 5
 number_of_calls: 20
 from_user: #{specs_from}
 steps:
@@ -914,7 +914,7 @@ steps:
 source: 192.0.2.15
 destination: 192.0.2.200
 max_concurrent: 10
-calls_per_second: 5
+call_rate: 5
 number_of_calls: 20
 from_user: #{specs_from}
 steps:
@@ -950,7 +950,7 @@ steps:
           'source' => '192.0.2.15',
           'destination' => '192.0.2.200',
           'max_concurrent' => 10,
-          'calls_per_second' => 5,
+          'call_rate' => 5,
           'number_of_calls' => override_options[:number_of_calls],
           'from_user' => "#{specs_from}"
         })
@@ -963,7 +963,7 @@ name: spec scenario
 source: 192.0.2.15
 destination: 192.0.2.200
 max_concurrent: 10
-calls_per_second: 5
+call_rate: 5
 number_of_calls: 20
 from_user: #{specs_from}
 steps:

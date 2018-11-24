@@ -6,6 +6,15 @@
 
 # Sippy Cup
 
+## NOTES for this fork
+
+* New instruction is added to insert wav file into pcap
+  -  `- play_audio "<wav file path>"`
+  - need spandsp library for encoidng a-law and u-law
+* Debug the DTMF packet generation (end of event) 
+  - reduce the duration to 200 milliseconds
+  - change obsolete rfc2833 to rfc4733
+
 ## Overview
 
 ### The Problem
@@ -78,7 +87,7 @@ Using `bundle` will then install the gem dependencies and allow you to run `sipp
 source: 192.0.2.15
 destination: 192.0.2.200
 max_concurrent: 10
-calls_per_second: 5
+call_rate: 5
 number_of_calls: 20
 steps:
   - invite
@@ -223,7 +232,7 @@ Each parameter has an impact on the test, and may either be changed once the XML
   <dd>By default, SIPp assigns RTP ports dynamically. However, if there is a need for a static RTP port (say, for data collection purposes), it can be done by supplying a port number here. Default: SIPp's default of 6000</dd>
 
   <dt>dtmf_mode</dt>
-  <dd>Specify the mechanism by which DTMF is signaled. Valid options are `rfc2833` for within the RTP media, or `info` for SIP INFO. Default: rfc2833</dd>
+  <dd>Specify the mechanism by which DTMF is signaled. Valid options are `rfc4733` for within the RTP media, or `info` for SIP INFO. Default: rfc4733</dd>
 
   <dt>scenario_variables</dt>
   <dd>If you're using sippy_cup to run a SIPp XML file, there may be CSV fields in the scenario ([field0], [field1], etc.). Specify a path to a CSV file containing the required information using this option. (File is semicolon delimeted, information can be found [here](http://sipp.sourceforge.net/doc/reference.html#inffile).) Default: unused</dd>
@@ -235,19 +244,19 @@ Each parameter has an impact on the test, and may either be changed once the XML
   <dd>The total number of calls permitted for the entire test. When this limit is reached, the test is over. Defaults to nil.</dd>
 
   <dt>concurrent_max</dt>
-  <dd>The maximum number of calls permitted to be active at any given time. When this limit is reached, SIPp will slow down or stop sending new calls until there it falls below the limit. Defaults to SIPp's default: (3 * call_duration (seconds) * calls_per_second)</dd>
+  <dd>The maximum number of calls permitted to be active at any given time. When this limit is reached, SIPp will slow down or stop sending new calls until there it falls below the limit. Defaults to SIPp's default: (3 * call_duration (seconds) * call_rate)</dd>
 
-  <dt>calls_per_second</dt>
+  <dt>call_rate</dt>
   <dd>The rate at which new calls should be created. Note that SIPp will automatically adjust this downward to stay at or beneath the maximum number of concurrent calls (`concurrent_max`). Defaults to SIP's default of 10</dt>
 
-  <dt>calls_per_second_incr</dt>
-  <dd>When used with `calls_per_second_max`, tells SIPp the amount by which `calls_per_second` should be incremented. CPS rate is adjusted each `calls_per_second_interval`. Default: 1.</dd>
+  <dt>call_rate_incr</dt>
+  <dd>When used with `call_rate_max`, tells SIPp the amount by which `call_rate` should be incremented. CPS rate is adjusted each `call_rate_interval`. Default: 1.</dd>
 
-  <dt>calls_per_second_interval</dt>
-  <dd>When used with `calls_per_second_max`, tells SIPp the time interval (in seconds) by which calls-per-second should be incremented. Default: Unset; SIPp's default (60s). NOTE: Requires a development build of SIPp; see https://github.com/SIPp/sipp/pull/107</dd>
+  <dt>call_rate_interval</dt>
+  <dd>When used with `call_rate_max`, tells SIPp the time interval (in seconds) by which calls-per-second should be incremented. Default: Unset; SIPp's default (60s). NOTE: Requires a development build of SIPp; see https://github.com/SIPp/sipp/pull/107</dd>
 
-  <dt>calls_per_second_max</dt>
-  <dd>The maximum rate of calls-per-second. Default: unused (`calls_per_second` will not change)</dd>
+  <dt>call_rate_max</dt>
+  <dd>The maximum rate of calls-per-second. Default: unused (`call_rate` will not change)</dd>
 
   <dt>advertise_address</dt>
   <dd>The IP address to advertise in SIP and SDP if different from the bind IP. Default: `source` IP address</dd>
