@@ -26,6 +26,15 @@ describe SippyCup::Scenario do
     expect(subject.to_xml).to match(%r{<scenario name="Test"/>})
   end
 
+  describe '#options' do
+    it "sends an OPTIONS message" do
+      subject.options
+
+      expect(subject.to_xml).to match(%r{<send>})
+      expect(subject.to_xml).to match(%r{OPTIONS})
+    end
+  end
+
   describe '#invite' do
     it "sends an INVITE message" do
       subject.invite
@@ -52,12 +61,12 @@ describe SippyCup::Scenario do
 
     context "with extra headers specified" do
       it "adds the headers to the end of the message" do
-        subject.invite headers: "Foo: <bar>\nBar: <baz>"
+        subject.invite headers: ["Foo: <bar>", "Bar: <baz>"]
         expect(subject.to_xml).to match(%r{Foo: <bar>\nBar: <baz>})
       end
 
       it "only has one blank line between headers and SDP" do
-        subject.invite headers: "Foo: <bar>\n\n\n"
+        subject.invite headers: ["Foo: <bar>\n\n\n"]
         expect(subject.to_xml).to match(%r{Foo: <bar>\n\nv=0})
       end
     end
@@ -119,6 +128,15 @@ describe SippyCup::Scenario do
         expect(subject.to_xml).to match(%r{INVITE sip:\[service\]@\[remote_ip\]:\[remote_port\]})
       end
     end
+
+    context "when a Max-Forward option is specified" do
+      it "sets the Max-Forward header properly" do
+        max_forwards = rand(100)
+        subject.invite(max_forwards: max_forwards)
+        expect(subject.to_xml).to match(%r{INVITE})
+        expect(subject.to_xml).to match(%r{Max-Forwards: #{max_forwards}})
+      end
+    end
   end
 
   describe "#register" do
@@ -175,6 +193,13 @@ describe SippyCup::Scenario do
       it "adds authentication data to the REGISTER message" do
         subject.register 'frank', 'abc123'
         expect(subject.to_xml).to match(%r{\[authentication username=frank password=abc123\]})
+      end
+    end
+
+    context "when a auth_keyword option is provided" do
+      it "adds parameterized authentication data to the REGISTER message" do
+        subject.register 'frank', nil, { auth_keyword: 'field0' }
+        expect(subject.to_xml).to match(%r{\[field0\]})
       end
     end
   end
@@ -279,6 +304,22 @@ describe SippyCup::Scenario do
     end
   end
 
+  describe '#receive_too_many_hops' do
+    it "expects a 483" do
+      subject.receive_too_many_hops
+
+      expect(scenario.to_xml).to match(%q{<recv response="483"/>})
+    end
+  end
+
+  describe '#receive_483' do
+    it "expects a 483" do
+      subject.receive_too_many_hops
+
+      expect(scenario.to_xml).to match(%q{<recv response="483"/>})
+    end
+  end
+
   describe '#ack_answer' do
     it "sends an ACK message" do
       subject.ack_answer
@@ -310,6 +351,45 @@ describe SippyCup::Scenario do
         subject.ack_answer
         expect(subject.to_xml(:pcap_path => "/dev/null")).not_to match(%r{<nop>\n.*<action>\n.*<exec play_pcap_audio="/dev/null"/>\n.*</action>\n.*</nop>})
       end
+    end
+  end
+
+  describe '#proxy_auth_required' do
+    it "expects a 407 by default" do
+      subject.proxy_auth_required
+
+      expect(subject.to_xml).to match(%r{<recv response="407" rrs="true" auth="true"/>})
+    end
+
+    it "can override the expected status code via options" do
+      status_code = 401
+      subject.proxy_auth_required(status_code: status_code)
+
+      expect(subject.to_xml).to match(%r{<recv response="#{status_code}" rrs="true" auth="true"/>})
+    end
+
+    it "sends an ACK" do
+      subject.proxy_auth_required
+
+      xml = subject.to_xml
+      expect(xml).to match(%r{<send>})
+      expect(xml).to match(%r{ACK})
+    end
+
+    it "can also be called via :receive_407" do
+      expect(subject.method(:receive_407)).to eq(subject.method(:proxy_auth_required))
+    end
+  end
+
+  describe '#receive forbidden' do
+    it "expects a 403 forbidden response" do
+      subject.receive_forbidden
+
+      expect(scenario.to_xml).to match(%r{<recv response="403"/>})
+    end
+
+    it "can also be called via :receive_403" do
+      expect(subject.method(:receive_403)).to eq(subject.method(:receive_forbidden))
     end
   end
 
@@ -412,6 +492,22 @@ describe SippyCup::Scenario do
 
       expect(scenario.to_xml).to match(%q{<recv foo="bar" request="BYE"/>})
       expect(scenario.to_xml).to match(%q{<recv foo="bar" request="BYE"/>})
+    end
+  end
+
+  describe '#hangup' do
+    it 'calls send_bye and receive_ok by default' do
+      opts = { foo: 'bar' }
+      expect(subject).to receive(:send_bye).with(opts)
+      expect(subject).to receive(:receive_ok).with(opts)
+      subject.hangup opts
+    end
+
+    it 'calls send_by_using_contact and receive_ok when passed a use_contact option' do
+      opts = { foo: 'bar', use_contact: true }
+      expect(subject).to receive(:send_bye_using_contact).with({ foo: 'bar' })
+      expect(subject).to receive(:receive_ok).with({ foo: 'bar' })
+      subject.hangup opts
     end
   end
 
