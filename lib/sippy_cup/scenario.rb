@@ -220,7 +220,7 @@ a=fmtp:101 0-15
       @reference_variables += %w(remote_addr local_addr call_addr)
     end
 
-    def invite_via_proxy(invite_headers, opts = {})
+    def invite_via_proxy(opts = {})
       opts[:retrans] ||= 500
       # FIXME: The DTMF mapping (101) is hard-coded. It would be better if we could
       # get this from the DTMF payload generator
@@ -241,7 +241,7 @@ Max-Forwards: #{max_forwards}
 User-Agent: #{user_agent}
 Content-Type: application/sdp
 Content-Length: [len]
-#{invite_headers}
+[authentication username=#{@from_user} password=#{@proxy_pass}]
 
 v=0
 o=user1 53655765 2353687637 IN IP[local_ip_type] #{@adv_ip}
@@ -1014,6 +1014,10 @@ Content-Length: 0
         @from_user, @from_domain = args[:from].to_s.split('@')
       else
         @from_user = args[:from_user] || "sipp"
+      end
+
+      if args[:proxy_pass]
+        @proxy_pass = args[:proxy_pass]
       end
 
       args[:to] ||= args[:to_user] if args.has_key?(:to_user)
