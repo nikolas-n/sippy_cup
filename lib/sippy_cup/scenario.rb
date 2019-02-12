@@ -860,6 +860,15 @@ Content-Length: 0
       receive_ok opts
     end
 
+    def start_call_via_proxy(opts = {})
+      invite
+      proxy_auth_required
+      ack_answer
+      invite_via_proxy
+      wait_for_answer
+      ack_answer
+    end
+
     # Create partition table for Call Length
     #
     # @param [Integer] min An value specifying the minimum time in milliseconds for the table
